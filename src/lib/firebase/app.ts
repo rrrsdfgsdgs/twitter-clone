@@ -10,6 +10,7 @@ import type { Functions } from 'firebase/functions';
 import type { Firestore } from 'firebase/firestore';
 import type { FirebaseApp } from 'firebase/app';
 import type { FirebaseStorage } from 'firebase/storage';
+import type { FirebaseOptions } from 'firebase/app';
 
 type Firebase = {
   auth: Auth;
@@ -19,8 +20,21 @@ type Firebase = {
   firebaseApp: FirebaseApp;
 };
 
+function sanitizeConfig(config: any): FirebaseOptions {
+  // Ensure all fields are strings (fallback to empty string if missing)
+  return {
+    apiKey: String(config.apiKey ?? ""),
+    authDomain: String(config.authDomain ?? ""),
+    projectId: String(config.projectId ?? ""),
+    storageBucket: String(config.storageBucket ?? ""),
+    messagingSenderId: String(config.messagingSenderId ?? ""),
+    appId: String(config.appId ?? ""),
+    measurementId: String(config.measurementId ?? "")
+  };
+}
+
 function initialize(): Firebase {
-  const firebaseApp = initializeApp(getFirebaseConfig());
+  const firebaseApp = initializeApp(sanitizeConfig(getFirebaseConfig()));
 
   const auth = getAuth(firebaseApp);
   const storage = getStorage(firebaseApp);
